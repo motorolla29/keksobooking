@@ -8,7 +8,14 @@ var propertyTemplate = document.querySelector('template').content.querySelector(
 var propertyArray = [];
 var propertiesFragment = document.createDocumentFragment();
 var pinsFragment = document.createDocumentFragment();
+var noticeForm = document.querySelector('.notice__form');
+var mapPinMain = document.querySelector('.map__pin--main');
 
+noticeForm.querySelectorAll('fieldset').forEach((item) => item.setAttribute('disabled', 'disabled'));
+noticeForm.querySelector('#address').value = `${window.getComputedStyle(mapPinMain).left.replace(/\D/ig, '')}, 
+${window.getComputedStyle(mapPinMain).top.replace(/\D/ig, '')}`;
+
+mapPinMain.addEventListener('mouseup', onMapPinMainMouseup);
 
 // Data
 var avatarData = ['img/avatars/user01.png', 'img/avatars/user02.png', 'img/avatars/user03.png', 'img/avatars/user04.png', 
@@ -32,6 +39,18 @@ var featuresData = ["wifi", "dishwasher", "parking", "washer", "elevator", "cond
 
 var avatarDataClone = Object.assign([], avatarData);
 
+renderRandomProperty(8);
+
+// map.classList.remove('map--faded');
+// mapPins.appendChild(renderPinsFragment());
+// map.insertBefore(renderPropertiesFragment(), document.querySelector('.map__filters-container'));
+
+
+function randomInteger(min, max) {
+    var rand = min - 0.5 + Math.random() * (max - min + 1);
+    return Math.round(rand);
+}
+
 function renderRandomProperty(quantityOfProperties) {
 
     for (var i = 0; i < quantityOfProperties; i++) {
@@ -51,9 +70,9 @@ function renderRandomProperty(quantityOfProperties) {
                 checkout: checkoutData[randomInteger(0, 2)],
                 features: featuresData.sort(() => Math.random() - 0.5).slice(0, randomInteger(1, 5)),
                 description: '',
-                photos: photosData.sort(() => Math.random() - 0.5),
+                photos: photosData.sort(() => Math.random() - 0.5).slice(0, randomInteger(3, 3)),
                 location: {
-                    x: randomInteger(130, mapPins.clientWidth),
+                    x: randomInteger(130, 1200),
                     y: randomInteger(130, 630)
                 }
             }
@@ -67,15 +86,6 @@ function renderRandomProperty(quantityOfProperties) {
 
     }
 }
-
-function randomInteger(min, max) {
-    var rand = min - 0.5 + Math.random() * (max - min + 1);
-    return Math.round(rand);
-}
-
-renderRandomProperty(8);
-
-map.classList.remove('map--faded');
 
 function renderPinsFragment() {
     
@@ -93,8 +103,6 @@ function renderPinsFragment() {
 
     return pinsFragment;
 }
-
-mapPins.appendChild(renderPinsFragment());
 
 
 function renderPropertiesFragment() {
@@ -198,6 +206,114 @@ function renderPropertiesFragment() {
 
 }
 
-map.insertBefore(renderPropertiesFragment(), document.querySelector('.map__filters-container'));
+function onMapPinMainMouseup(evt) {
+    map.classList.remove('map--faded');
+    noticeForm.classList.remove('notice__form--disabled');
+    noticeForm.querySelectorAll('fieldset').forEach((item) => item.removeAttribute('disabled', 'disabled'));
+    mapPins.appendChild(renderPinsFragment());
+    map.insertBefore(renderPropertiesFragment(), document.querySelector('.map__filters-container'));
 
+    var mapPinsButtons = mapPins.querySelectorAll('.map__pin');
+    var mapCards = map.querySelectorAll('.map__card');
 
+    mapCards.forEach(card => {
+        card.classList.add('hidden');
+    });
+
+    mapPinsButtons.forEach(item => {
+        if (item !== mapPinMain) {
+            item.addEventListener('click', function() {
+            
+                mapCards.forEach(card => {
+                card.classList.add('hidden');
+                });
+
+                for (var i = 1; i <= mapCards.length; i++ ) {
+                    if (item === mapPinsButtons[i]) {
+                        mapCards[i-1].classList.remove('hidden');
+                        var currentCard = mapCards[i-1];
+                        var hideCard = function() {
+                            currentCard.classList.add('hidden');
+                            currentCard.querySelector('.popup__close').removeEventListener('click', hideCard);
+                        };
+                        currentCard.querySelector('.popup__close').addEventListener('click', hideCard);
+                    }   
+                }
+            });
+        }
+    });
+
+    noticeForm.querySelector('#address').value = `${window.getComputedStyle(evt.target).left.match(/\d/ig)}, ${window.getComputedStyle(evt.target).left.match(/\d/ig)}`;
+}
+
+// Form
+var capacitySelect = document.querySelector('#capacity');
+var roomNumberSelect = document.querySelector('#room_number');
+var timeinSelect = document.querySelector('#timein');
+var timeoutSelect = document.querySelector('#timeout');
+var typeOfPropertySelect = document.querySelector('#type');
+var priceInput = document.querySelector('#price');
+
+roomNumberSelect.addEventListener('change', function() {
+    var currentVal = this.value;
+
+    for (var i = 0; i < capacitySelect.children.length; i++) {
+        capacitySelect.children[i].disabled = false;
+    }
+
+    if (currentVal === '1') {
+        capacitySelect.children[0].disabled = true;
+        capacitySelect.children[1].disabled = true;
+        capacitySelect.children[3].disabled = true;
+        capacitySelect.value = '1';
+    } else if (currentVal === '2') {
+        capacitySelect.children[0].disabled = true;
+        capacitySelect.children[3].disabled = true;
+        capacitySelect.value = '1';
+    } else if (currentVal === '3') {
+        capacitySelect.children[3].disabled = true;
+        capacitySelect.value = '1';
+    } else if (currentVal === '100') {
+        capacitySelect.children[0].disabled = true;
+        capacitySelect.children[1].disabled = true;
+        capacitySelect.children[2].disabled = true;
+        capacitySelect.value = '0';
+    }
+});
+
+timeinSelect.addEventListener('change', function() {
+    var currentVal = this.value;
+
+    timeoutSelect.value = currentVal;
+});
+
+timeoutSelect.addEventListener('change', function() {
+    var currentVal = this.value;
+
+    timeinSelect.value = currentVal;
+});
+
+typeOfPropertySelect.addEventListener('change', function() {
+    var currentVal = this.value;
+
+    switch(currentVal) {
+        case 'flat':
+            priceInput.setAttribute('placeholder', '1000');
+            priceInput.setAttribute('min', '1000');
+            break;
+        case 'bungalo':
+            priceInput.setAttribute('placeholder', '0');
+            priceInput.setAttribute('min', '0');
+            break;
+        case 'house':
+            priceInput.setAttribute('placeholder', '5000');
+            priceInput.setAttribute('min', '5000');
+            break;
+        case 'palace':
+            priceInput.setAttribute('placeholder', '10000');
+            priceInput.setAttribute('min', '10000');
+            break;
+        default:
+            break;
+    }
+});
