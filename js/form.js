@@ -1,9 +1,11 @@
 'use strict';
 
 (function() {
-    
-// Form
 
+var map = document.querySelector('.map');
+var mapPins = document.querySelector('.map__pins');
+var mapPinMain = document.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
 var capacitySelect = document.querySelector('#capacity');
 var roomNumberSelect = document.querySelector('#room_number');
 var timeinSelect = document.querySelector('#timein');
@@ -73,6 +75,33 @@ typeOfPropertySelect.addEventListener('change', function() {
         default:
             break;
     }
+});
+
+var successFormSendHandler = function() {
+    window.showModal('Форма отправлена!', 'Хорошо');
+
+    // Удаление пинов и карт
+    document.querySelectorAll('.map article').forEach ((item) => map.removeChild(item));
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach ((item) => mapPins.removeChild(item));
+    //
+
+    noticeForm.reset();
+    noticeForm.classList.add('notice__form--disabled');
+    noticeForm.querySelectorAll('fieldset').forEach((item) => item.setAttribute('disabled', 'disabled'));
+    map.classList.add('map--faded');
+    mapPinMain.removeAttribute('style');
+
+    window.backend.loadData(window.dataLoadHandlers.successDataLoadHandler, window.dataLoadHandlers.errorDataLoadHandler);
+};
+
+var errorFormSendHandler = function(errorMessage) {
+    window.showModal(errorMessage, 'Попробовать ещё раз!');
+};
+
+noticeForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    var formToSend = new FormData(noticeForm);
+    window.backend.sendForm(formToSend, successFormSendHandler, errorFormSendHandler);
 });
 
 })();

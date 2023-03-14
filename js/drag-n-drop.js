@@ -2,16 +2,15 @@
 
 (function() {
 
-// Drag n Drop
-
 var map = document.querySelector('.map');
 var noticeForm = document.querySelector('.notice__form');
 var mapPinMain = document.querySelector('.map__pin--main');
 var mapPins = document.querySelector('.map__pins');
+var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
 var MAP_PIN_MAIN_HEIGHT = 53;
 var Y_AXIS_OFFSET = 351;
 
-mapPinMain.addEventListener('mousedown', function(downEvt) {
+window.onMapPinMainMousedown = function(downEvt) {
     
     downEvt.preventDefault();
 
@@ -44,7 +43,7 @@ mapPinMain.addEventListener('mousedown', function(downEvt) {
 
         map.classList.remove('map--faded');
         noticeForm.classList.remove('notice__form--disabled');
-        noticeForm.querySelectorAll('fieldset').forEach((item) => item.removeAttribute('disabled', 'disabled'));
+        noticeFormFieldsets.forEach((item) => item.removeAttribute('disabled', 'disabled'));
         mapPins.appendChild(window.pinsFragment);
         map.insertBefore(window.propertiesFragment, document.querySelector('.map__filters-container'));
 
@@ -86,7 +85,9 @@ mapPinMain.addEventListener('mousedown', function(downEvt) {
     map.addEventListener('mousemove', onMapPinMainMousemove);
     document.addEventListener('mouseup', onMapPinMainMouseup);
 
-});
+};
+
+mapPinMain.addEventListener('mousedown', window.onMapPinMainMousedown);
 
 })();
 
