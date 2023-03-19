@@ -13,6 +13,11 @@ var timeoutSelect = document.querySelector('#timeout');
 var typeOfPropertySelect = document.querySelector('#type');
 var priceInput = document.querySelector('#price');
 
+window.removeCardsAndPins = function() {
+    document.querySelectorAll('.map article').forEach ((item) => map.removeChild(item));
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach ((item) => mapPins.removeChild(item));
+};
+
 roomNumberSelect.addEventListener('change', function() {
     var currentVal = this.value;
 
@@ -80,11 +85,7 @@ typeOfPropertySelect.addEventListener('change', function() {
 var successFormSendHandler = function() {
     window.showModal('Форма отправлена!', 'Хорошо');
 
-    // Удаление пинов и карт
-    document.querySelectorAll('.map article').forEach ((item) => map.removeChild(item));
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach ((item) => mapPins.removeChild(item));
-    //
-
+    window.removeCardsAndPins();
     noticeForm.reset();
     noticeForm.classList.add('notice__form--disabled');
     noticeForm.querySelectorAll('fieldset').forEach((item) => item.setAttribute('disabled', 'disabled'));

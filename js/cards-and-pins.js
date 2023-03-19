@@ -2,8 +2,6 @@
 
 (function() {
 
-window.propertiesFragment = document.createDocumentFragment();
-window.pinsFragment = document.createDocumentFragment();
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var propertyTemplate = document.querySelector('template').content.querySelector('.map__card');
 
@@ -13,45 +11,55 @@ var randomInteger = function(min, max) {
 };
 
 window.dataLoadHandlers = {
-    successDataLoadHandler: function (propertyArray) {
+    successDataLoadHandler: function (data) {
+        window.propertiesFragment = document.createDocumentFragment();
+        window.pinsFragment = document.createDocumentFragment();
+        window.propertyArray = data;
 
-        for(var i = 0; i < propertyArray.length; i++) {
+        for(var i = 0; i < data.length; i++) {
         
             var property = propertyTemplate.cloneNode(true);
     
-            property.querySelector('.popup__avatar').setAttribute('src', propertyArray[i].author.avatar);
+            property.querySelector('.popup__avatar').setAttribute('src', data[i].author.avatar);
     
-            property.querySelector('.popup__title').textContent = propertyArray[i].offer.title;
+            property.querySelector('.popup__title').textContent = data[i].offer.title;
     
-            property.querySelector('.popup__text--address').textContent = propertyArray[i].offer.address;
+            property.querySelector('.popup__text--address').textContent = data[i].offer.address;
     
-            property.querySelector('.popup__price').textContent = `${propertyArray[i].offer.price} ₽/ночь`;
+            property.querySelector('.popup__price').textContent = `${data[i].offer.price} ₽/ночь`;
+
+            property.querySelector('.popup__text--capacity').textContent = `${data[i].offer.rooms} комнаты для ${data[i].offer.guests} гостей`;
+
+            property.querySelector('.popup__text--time').textContent = `Заезд после ${data[i].offer.checkin}, выезд до ${data[i].offer.checkout}`;
     
             switch (true) {
-                case (/Квартира/i.test(propertyArray[i].offer.title)):
+                case (data[i].offer.type === 'flat'):
                     property.querySelector('.popup__type').textContent = 'Flat';
                     break;
-                case (/Бунгало/i.test(propertyArray[i].offer.title)):
-                    property.querySelector('.popup__type').textContent = 'Bungalo';
+                case (data[i].offer.type === 'bungalow'):
+                    property.querySelector('.popup__type').textContent = 'Bungalow';
                     break;
-                case (/Дом/i.test(propertyArray[i].offer.title)):
+                case (data[i].offer.type === 'house'):
                     property.querySelector('.popup__type').textContent = 'House';
                     break;
-                case (/Дворец/i.test(propertyArray[i].offer.title)):
+                case (data[i].offer.type === 'palace'):
                     property.querySelector('.popup__type').textContent = 'Palace';
+                    break;
+                case (data[i].offer.type === 'hotel'):
+                    property.querySelector('.popup__type').textContent = 'Hotel';
                     break;
                 default:
                     property.querySelector('.popup__type').textContent = 'Some property for rent';
                     break;
             }
     
-            property.querySelector('.popup__description').textContent = propertyArray[i].offer.description;
+            property.querySelector('.popup__description').textContent = data[i].offer.description;
     
-            if (propertyArray[i].offer.photos) {
-                for (var a = 0; a < propertyArray[i].offer.photos.length; a++) {
+            if (data[i].offer.photos) {
+                for (var a = 0; a < data[i].offer.photos.length; a++) {
                     var photo = document.createElement('li');
                     photo.innerHTML = `<img src=
-                    "${propertyArray[i].offer.photos[a]}">`;
+                    "${data[i].offer.photos[a]}">`;
                     property.querySelector('.popup__pictures').appendChild(photo);
                 }   
             }
@@ -60,12 +68,12 @@ window.dataLoadHandlers = {
             window.propertiesFragment.appendChild(property);
         }    
     
-        for (let i = 0; i < propertyArray.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             var mapPin = mapPinTemplate.cloneNode(true);
         
             mapPin.style = `left: ${randomInteger(130, 1200)}px; top: ${randomInteger(130, 630)}px`;
-            mapPin.querySelector('img').src = propertyArray[i].author.avatar;
-            mapPin.querySelector('img').setAttribute('alt', `${propertyArray[i].offer.title}`);
+            mapPin.querySelector('img').src = data[i].author.avatar;
+            mapPin.querySelector('img').setAttribute('alt', `${data[i].offer.title}`);
         
             window.pinsFragment.appendChild(mapPin);
         }

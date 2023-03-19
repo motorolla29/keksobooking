@@ -10,7 +10,44 @@ var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
 var MAP_PIN_MAIN_HEIGHT = 53;
 var Y_AXIS_OFFSET = 351;
 
-window.onMapPinMainMousedown = function(downEvt) {
+window.renderPinsAndCards = function() {
+    map.classList.remove('map--faded');
+        noticeForm.classList.remove('notice__form--disabled');
+        noticeFormFieldsets.forEach((item) => item.removeAttribute('disabled', 'disabled'));
+        mapPins.appendChild(window.pinsFragment);
+        map.insertBefore(window.propertiesFragment, document.querySelector('.map__filters-container'));
+
+        var mapPinsButtons = mapPins.querySelectorAll('.map__pin');
+        var mapCards = map.querySelectorAll('.map__card');
+
+        mapCards.forEach(card => {
+            card.classList.add('hidden');
+        });
+        
+        mapPinsButtons.forEach(item => {
+            if (item !== mapPinMain) {
+                item.addEventListener('click', function() {
+                
+                    mapCards.forEach(card => {
+                    card.classList.add('hidden');
+                    });
+                    for (var i = 1; i <= mapCards.length; i++ ) {
+                        if (item === mapPinsButtons[i]) {
+                            mapCards[i-1].classList.remove('hidden');
+                            var currentCard = mapCards[i-1];
+                            var hideCard = function() {
+                                currentCard.classList.add('hidden');
+                                currentCard.querySelector('.popup__close').removeEventListener('click', hideCard);
+                            };
+                            currentCard.querySelector('.popup__close').addEventListener('click', hideCard);
+                        }   
+                    }
+                });
+            }
+        });
+};
+
+var onMapPinMainMousedown = function(downEvt) {
     
     downEvt.preventDefault();
 
@@ -39,42 +76,9 @@ window.onMapPinMainMousedown = function(downEvt) {
 
     };
 
-    var onMapPinMainMouseup = function(upEvt) {
+        var onMapPinMainMouseup = function(upEvt) {
 
-        map.classList.remove('map--faded');
-        noticeForm.classList.remove('notice__form--disabled');
-        noticeFormFieldsets.forEach((item) => item.removeAttribute('disabled', 'disabled'));
-        mapPins.appendChild(window.pinsFragment);
-        map.insertBefore(window.propertiesFragment, document.querySelector('.map__filters-container'));
-
-        var mapPinsButtons = mapPins.querySelectorAll('.map__pin');
-        var mapCards = map.querySelectorAll('.map__card');
-        
-        mapCards.forEach(card => {
-            card.classList.add('hidden');
-        });
-        
-        mapPinsButtons.forEach(item => {
-            if (item !== mapPinMain) {
-                item.addEventListener('click', function() {
-                
-                    mapCards.forEach(card => {
-                    card.classList.add('hidden');
-                    });
-                    for (var i = 1; i <= mapCards.length; i++ ) {
-                        if (item === mapPinsButtons[i]) {
-                            mapCards[i-1].classList.remove('hidden');
-                            var currentCard = mapCards[i-1];
-                            var hideCard = function() {
-                                currentCard.classList.add('hidden');
-                                currentCard.querySelector('.popup__close').removeEventListener('click', hideCard);
-                            };
-                            currentCard.querySelector('.popup__close').addEventListener('click', hideCard);
-                        }   
-                    }
-                });
-            }
-        });
+        window.renderPinsAndCards();
     
         noticeForm.querySelector('#address').value = `${startCoords.x - Y_AXIS_OFFSET}, ${startCoords.y + MAP_PIN_MAIN_HEIGHT}`;
 
@@ -87,7 +91,7 @@ window.onMapPinMainMousedown = function(downEvt) {
 
 };
 
-mapPinMain.addEventListener('mousedown', window.onMapPinMainMousedown);
+mapPinMain.addEventListener('mousedown', onMapPinMainMousedown);
 
 })();
 
