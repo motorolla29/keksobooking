@@ -12,39 +12,39 @@ var Y_AXIS_OFFSET = 351;
 
 window.renderPinsAndCards = function() {
     map.classList.remove('map--faded');
-        noticeForm.classList.remove('notice__form--disabled');
-        noticeFormFieldsets.forEach((item) => item.removeAttribute('disabled', 'disabled'));
-        mapPins.appendChild(window.pinsFragment);
-        map.insertBefore(window.propertiesFragment, document.querySelector('.map__filters-container'));
+    noticeForm.classList.remove('notice__form--disabled');
+    noticeFormFieldsets.forEach((item) => item.removeAttribute('disabled', 'disabled'));
+    mapPins.appendChild(window.pinsFragment);
+    map.insertBefore(window.cardsFragment, document.querySelector('.map__filters-container'));
 
-        var mapPinsButtons = mapPins.querySelectorAll('.map__pin');
-        var mapCards = map.querySelectorAll('.map__card');
+    var mapPinsButtons = mapPins.querySelectorAll('.map__pin');
+    var mapCards = map.querySelectorAll('.map__card');
 
-        mapCards.forEach(card => {
-            card.classList.add('hidden');
-        });
+    mapCards.forEach(card => {
+        card.classList.add('hidden');
+    });
         
-        mapPinsButtons.forEach(item => {
-            if (item !== mapPinMain) {
-                item.addEventListener('click', function() {
+    mapPinsButtons.forEach(item => {
+        if (item !== mapPinMain) {
+            item.addEventListener('click', function() {
                 
-                    mapCards.forEach(card => {
+                mapCards.forEach(card => {
                     card.classList.add('hidden');
-                    });
-                    for (var i = 1; i <= mapCards.length; i++ ) {
-                        if (item === mapPinsButtons[i]) {
-                            mapCards[i-1].classList.remove('hidden');
-                            var currentCard = mapCards[i-1];
-                            var hideCard = function() {
-                                currentCard.classList.add('hidden');
-                                currentCard.querySelector('.popup__close').removeEventListener('click', hideCard);
-                            };
-                            currentCard.querySelector('.popup__close').addEventListener('click', hideCard);
-                        }   
-                    }
                 });
-            }
-        });
+                for (var i = 1; i <= mapCards.length; i++ ) {
+                    if (item === mapPinsButtons[i]) {
+                        mapCards[i-1].classList.remove('hidden');
+                        var currentCard = mapCards[i-1];
+                        var hideCard = function() {
+                            currentCard.classList.add('hidden');
+                            currentCard.querySelector('.popup__close').removeEventListener('click', hideCard);
+                        };
+                        currentCard.querySelector('.popup__close').addEventListener('click', hideCard);
+                    }   
+                }
+            });
+        }
+    });
 };
 
 var onMapPinMainMousedown = function(downEvt) {

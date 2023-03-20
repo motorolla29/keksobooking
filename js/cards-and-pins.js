@@ -12,7 +12,7 @@ var randomInteger = function(min, max) {
 
 window.dataLoadHandlers = {
     successDataLoadHandler: function (data) {
-        window.propertiesFragment = document.createDocumentFragment();
+        window.cardsFragment = document.createDocumentFragment();
         window.pinsFragment = document.createDocumentFragment();
         window.propertyArray = data;
 
@@ -31,7 +31,15 @@ window.dataLoadHandlers = {
             property.querySelector('.popup__text--capacity').textContent = `${data[i].offer.rooms} комнаты для ${data[i].offer.guests} гостей`;
 
             property.querySelector('.popup__text--time').textContent = `Заезд после ${data[i].offer.checkin}, выезд до ${data[i].offer.checkout}`;
-    
+
+            if (data[i].offer.features) {
+                data[i].offer.features.forEach((feature) => {
+                    var item = document.createElement('li');
+                    item.classList.add('feature', `feature--${feature}`);
+                    property.querySelector('.popup__features').appendChild(item);
+                });
+            }
+
             switch (true) {
                 case (data[i].offer.type === 'flat'):
                     property.querySelector('.popup__type').textContent = 'Flat';
@@ -65,7 +73,7 @@ window.dataLoadHandlers = {
             }
             
             
-            window.propertiesFragment.appendChild(property);
+            window.cardsFragment.appendChild(property);
         }    
     
         for (let i = 0; i < data.length; i++) {
