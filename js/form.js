@@ -12,11 +12,19 @@ var timeinSelect = document.querySelector('#timein');
 var timeoutSelect = document.querySelector('#timeout');
 var typeOfPropertySelect = document.querySelector('#type');
 var priceInput = document.querySelector('#price');
+var avatarChooser = document.querySelector('#avatar');
+var avatarPreview = document.querySelector('.notice__preview img');
+var cardPhotosChooser = document.querySelector('#images');
+var formPhotoContainer = document.querySelector('.form__photo-container');
+var resetBtn =  document.querySelector('.form__reset');
+var FILE_TYPES = ['gif', 'jpeg', 'jpg', 'png'];
 
 window.removeCardsAndPins = function() {
     document.querySelectorAll('.map article').forEach ((item) => map.removeChild(item));
     document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach ((item) => mapPins.removeChild(item));
 };
+
+// Синхронизация полей
 
 roomNumberSelect.addEventListener('change', function() {
     var currentVal = this.value;
@@ -81,6 +89,61 @@ typeOfPropertySelect.addEventListener('change', function() {
             break;
     }
 });
+
+// Загрузка фотографий
+
+var readFiles = function(photoChooser, photosContainer) {
+    var reader = [];
+    var files = photoChooser.files;
+
+    for (var i = 0; i < files.length; i++) {
+        
+        var fileName = files[i].name.toLowerCase();
+
+        var matches = FILE_TYPES.some(function (it) {
+            return fileName.endsWith(it);
+        });
+
+        if (matches) {
+            reader[i] = new FileReader();
+
+            reader[i].readAsDataURL(files[i]);
+
+            if (photoChooser.hasAttribute('multiple')) {
+                var photo = document.createElement('img');
+                var photoId = 'photo:' + fileName;
+                photo.style.cssText = 'margin: 5px; width: 40%;';
+                photo.setAttribute("id", photoId);
+                photosContainer.append(photo);
+
+                (function(photoId) {
+                    reader[i].addEventListener('load', function(e) {
+                        document.getElementById(photoId).src = e.target.result;
+                    });
+                })(photoId);
+            } else {
+                reader[i].addEventListener('load', function(e) {
+                    photosContainer.src = e.target.result;
+                });
+            }
+        }
+    }
+};
+
+avatarChooser.addEventListener('change', function() {
+    readFiles(avatarChooser, avatarPreview);
+});
+
+cardPhotosChooser.addEventListener('change', function() {
+    readFiles(cardPhotosChooser, formPhotoContainer);
+});
+
+resetBtn.addEventListener('click', function() {
+    avatarPreview.src = "img/muffin.png";
+    formPhotoContainer.querySelectorAll('img').forEach(item => item.remove());
+});
+
+// Успешная/неуспешная отправка формы
 
 var successFormSendHandler = function() {
     window.showModal('Форма отправлена!', 'Хорошо');

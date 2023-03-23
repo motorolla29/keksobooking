@@ -613,6 +613,7 @@ textarea:focus {
 
 .form__photo-container {
   width: 140px;
+  display: inline-block;
 }
 
 .form__element--submit {
