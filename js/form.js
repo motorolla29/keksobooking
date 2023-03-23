@@ -138,23 +138,28 @@ cardPhotosChooser.addEventListener('change', function() {
     readFiles(cardPhotosChooser, formPhotoContainer);
 });
 
-resetBtn.addEventListener('click', function() {
-    avatarPreview.src = "img/muffin.png";
-    formPhotoContainer.querySelectorAll('img').forEach(item => item.remove());
-});
+
 
 // Успешная/неуспешная отправка формы
-
-var successFormSendHandler = function() {
-    window.showModal('Форма отправлена!', 'Хорошо');
-
+var mapReset = function() {
     window.removeCardsAndPins();
     noticeForm.reset();
     noticeForm.classList.add('notice__form--disabled');
     noticeForm.querySelectorAll('fieldset').forEach((item) => item.setAttribute('disabled', 'disabled'));
     map.classList.add('map--faded');
     mapPinMain.removeAttribute('style');
+};
 
+resetBtn.addEventListener('click', function() {
+    avatarPreview.src = "img/muffin.png";
+    formPhotoContainer.querySelectorAll('img').forEach(item => item.remove());
+    mapReset();
+    window.backend.loadData(window.dataLoadHandlers.successDataLoadHandler, window.dataLoadHandlers.errorDataLoadHandler);
+});
+
+var successFormSendHandler = function() {
+    window.showModal('Форма отправлена!', 'Хорошо');
+    mapReset();
     window.backend.loadData(window.dataLoadHandlers.successDataLoadHandler, window.dataLoadHandlers.errorDataLoadHandler);
 };
 
